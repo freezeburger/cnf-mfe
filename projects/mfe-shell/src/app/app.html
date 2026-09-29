@@ -1,12 +1,13 @@
-﻿<main class="app-shell">
+<main class="app-shell">
   <header class="topbar" aria-label="Navigation principale">
     <div class="brand">{{ title() }}</div>
     <nav class="nav-list" aria-label="Menu principal">
-      <a href="#">Accueil</a>
-      <a href="#">Produits</a>
-      <a href="#">Administration</a>
+      <a routerLink="/">Accueil</a>
+      <a routerLink="/">Produits</a>
+      <a routerLink="/">Administration</a>
     </nav>
   </header>
 
   <router-outlet />
 </main>
+

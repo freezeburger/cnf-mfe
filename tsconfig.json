@@ -3,7 +3,12 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
+      "@core/*": ["src/core/*"],
+      "@infra/*": ["src/infra/*"],
+      "@share/*": ["src/share/*"],
+      "@env": ["src/environments"],
       "design-system": ["./dist/design-system"],
       "http-client": ["./dist/http-client"],
       "mfe-sse": ["./dist/mfe-sse"]
