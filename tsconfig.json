@@ -3,6 +3,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "design-system": ["./dist/design-system"],
+      "http-client": ["./dist/http-client"],
+      "mfe-sse": ["./dist/mfe-sse"]
+    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -24,10 +29,31 @@
   "files": [],
   "references": [
     {
-      "path": "./tsconfig.app.json"
+      "path": "./projects/mfe-shell/tsconfig.app.json"
     },
     {
-      "path": "./tsconfig.spec.json"
+      "path": "./projects/mfe-products/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/mfe-admin/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/lib-design-system/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/lib-design-system/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/lib-http-client/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/lib-http-client/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/lib-mfe-sse/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/lib-mfe-sse/tsconfig.spec.json"
     }
   ]
 }

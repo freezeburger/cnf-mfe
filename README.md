@@ -1,59 +1,57 @@
-# 21Ws
+﻿# Workspace Angular 21 — Shell + MFE + design system
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
+## Objectif
+Ce workspace est organisé selon une architecture de microfrontends avec shell, deux applications MFE et trois bibliothèques partagées.
 
-## Development server
+## Structure
 
-To start a local development server, run:
-
-```bash
-ng serve
+```text
+/projects
+  /mfe-shell
+  /mfe-products
+  /mfe-admin
+  /lib-design-system
+  /lib-http-client
+  /lib-mfe-sse
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Règles de conception
+- `mfe-*` pour les applications front-end isolées
+- `lib-*` pour les bibliothèques réutilisables
+- `OnPush` et signals dans les composants Angular 21
+- routes lazy-loadées dans chaque application
+- injection token pour la configuration d’environnement
+- services d’infra dans la couche HTTP/SSE
+- types stricts, avec schémas Zod pour les modèles de données
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Commandes utiles
 
 ```bash
-ng build
+# Construire le shell
+npx ng build mfe-shell
+
+# Construire les MFE
+npx ng build mfe-products
+npx ng build mfe-admin
+
+# Construire les bibliothèques
+npx ng build lib-design-system
+npx ng build lib-http-client
+npx ng build lib-mfe-sse
+
+# Lancer le shell
+npx ng serve mfe-shell
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Prompts utiles pour le développement
+- "Crée un composant de liste de produits avec filtering et signal state."
+- "Ajoute une abstraction HTTP dédiée avec gestion d’erreurs et schéma Zod pour les DTOs."
+- "Réalise un service presenter pour le MFE admin avec observables et gestion de l’état."
+- "Implémente un composant de design system réutilisable avec API typée et accessibilité.”
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Bonnes pratiques
+- Séparer les domaines dans les features et garder un Presenter Service si le composant devient complexe.
+- Préférer les composants standalone
+- Centraliser les erreurs HTTP dans les abstractions `lib-http-client`
+- Utiliser un mécanisme de communication MFE par `lib-mfe-sse`
+- Documenter les API via TSDoc et `@example`
