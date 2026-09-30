@@ -233,58 +233,89 @@ Vérifier les points suivants :
 
 ### Ajout manuel
 
-Sans le générateur, reproduire les mêmes étapes à la main en partant de `mfe-admin`. Éviter
-`ng generate application` : il crée des builders `@angular/build` standard qu'il faudrait
-ensuite remplacer par ceux de Native Federation v4.
+Sans le générateur, créer le MFE avec l'Angular CLI et le schematic Native Federation v4, puis
+l'aligner sur la structure du workspace. L'exemple utilise `invoices` sur le port `4204`.
 
-#### 1. Déclarer le projet dans `angular.json`
+#### 1. Générer l'application
 
-Dupliquer le bloc `"mfe-admin": { ... }`, le renommer `"mfe-invoices"`, remplacer toutes les
-occurrences de `mfe-admin` par `mfe-invoices`, puis choisir un port libre dans
-`serve-original.options.port` (ex. `4204`).
+```bash
+npx ng generate application mfe-invoices --routing --style css --skip-tests --ssr false --prefix app
+```
 
-#### 2. Créer les fichiers techniques
+La commande crée `projects/mfe-invoices/`, déclare le projet dans `angular.json` et ajoute sa
+référence dans `tsconfig.json`.
 
-Copier depuis `projects/mfe-admin/` puis remplacer `mfe-admin` par `mfe-invoices` :
+#### 2. Transformer l'application en remote
 
-| Fichier                                   | Adaptation                                                     |
-| ----------------------------------------- | -------------------------------------------------------------- |
-| `federation.config.mjs`                   | `name` et chemin de `./Routes`                                 |
-| `tsconfig.app.json`, `tsconfig.spec.json` | retirer les chemins propres à `alerts` dans `include`          |
-| `public/favicon.ico`                      | aucune                                                         |
-| `src/index.html`                          | titre de la page                                               |
-| `src/styles.css`, `src/bootstrap.ts`      | aucune                                                         |
-| `src/main.ts`                             | clé `initFederation({ 'mfe-invoices': './remoteEntry.json' })` |
-| `src/environments.ts`                     | `appName`                                                      |
-| `src/app/app.ts`, `src/app/app.config.ts` | alias `@invoices/...`                                          |
-| `src/core/config/environment.ts`          | aucune                                                         |
-| `src/share/components/index.ts`           | composants partagés exposés                                    |
-| `src/layout/app-layout.component.ts`      | libellés                                                       |
+```bash
+npx ng generate @angular-architects/native-federation-v4:init --project mfe-invoices --port 4204 --type remote
+```
 
-Ajouter l'alias et la référence du projet dans `tsconfig.json` :
+Le schematic remplace les builders par ceux de Native Federation (`build`, `serve`, `esbuild`,
+`serve-original` sur le port `4204`), crée `federation.config.mjs` et `src/bootstrap.ts`, et
+réécrit `src/main.ts` avec `initFederation`.
+
+Compléter ensuite `federation.config.mjs`, comme dans `mfe-admin` :
+
+```js
+exposes: {
+  './Routes': './projects/mfe-invoices/src/app/app.routes.ts', // remplace './Component'
+},
+
+sharedMappings: [
+  [
+    ['design-system', 'http-client', 'lib-config', 'mfe-sse'],
+    { includeSecondaries: { keepAll: true } },
+  ],
+],
+```
+
+Ajouter l'alias du projet dans `tsconfig.json` :
 
 ```jsonc
 "paths": {
   "@invoices/*": ["projects/mfe-invoices/src/*"],
   // ...
-},
-"references": [
-  // ...
-  { "path": "./projects/mfe-invoices/tsconfig.app.json" }
-]
+}
 ```
 
-#### 3. Écrire le domaine
+#### 3. Générer la structure du domaine
 
-Créer `src/features/invoices/` et `src/infra/http/` en respectant l'ordre des dépendances :
+Depuis la racine du workspace :
 
-1. `models/invoice.model.ts` : schéma Zod et type `z.infer` ;
-2. `infra/http/invoices-http.service.ts` : `HttpClientService` de `http-client`, URL issue de
-   `APP_ENVIRONMENT`, réponse validée par le schéma ;
-3. `services/invoices-query.service.ts` : lecture exposée par `resource()`, commandes séparées ;
-4. `invoices.presenter.ts` : état `signal` et dérivés `computed`, fourni par la page ;
-5. `components/` : composants `OnPush` de présentation, exposés par `index.ts` ;
-6. `pages/invoices.page.ts` : page lazy qui connecte le flux SSE partagé :
+```bash
+# Page lazy, composant de présentation et layout (OnPush, template inline)
+npx ng g component invoices --project mfe-invoices --path projects/mfe-invoices/src/features/invoices/pages --flat --type page --change-detection OnPush --inline-template --inline-style --skip-tests
+npx ng g component invoice-card --project mfe-invoices --path projects/mfe-invoices/src/features/invoices/components --flat --type component --change-detection OnPush --inline-template --inline-style --skip-tests
+npx ng g component app-layout --project mfe-invoices --path projects/mfe-invoices/src/layout --flat --type component --selector app-layout --change-detection OnPush --inline-template --inline-style --skip-tests
+
+# Adaptateur HTTP, query CQS et presenter
+npx ng g service invoices-http --project mfe-invoices --path projects/mfe-invoices/src/infra/http --type service --skip-tests
+npx ng g service invoices-query --project mfe-invoices --path projects/mfe-invoices/src/features/invoices/services --type service --skip-tests
+npx ng g service invoices --project mfe-invoices --path projects/mfe-invoices/src/features/invoices --type presenter --skip-tests
+```
+
+Créer à la main les fichiers sans schematic :
+
+| Fichier                                         | Contenu                                              |
+| ----------------------------------------------- | ---------------------------------------------------- |
+| `src/environments.ts`                           | `AppEnvironment` (`appName`, `apiBaseUrl`, `sseUrl`) |
+| `src/core/config/environment.ts`                | copie de `mfe-admin` (`provideEnvironment`)          |
+| `src/features/invoices/models/invoice.model.ts` | schéma Zod et type `z.infer`                         |
+| `src/features/invoices/components/index.ts`     | barrel des composants                                |
+| `src/features/invoices/index.ts`                | barrel public du domaine                             |
+| `src/share/components/index.ts`                 | réexport des composants de `design-system`           |
+
+#### 4. Implémenter le remote
+
+- `src/app/app.config.ts` : ajouter `provideHttpClient()` et `...provideEnvironment()` ;
+- `src/app/app.html` : remplacer la page d'exemple du CLI par `<app-layout />` (ou `<router-outlet />`) ;
+- `invoices-http.service.ts` : `HttpClientService` de `http-client`, URL issue de
+  `APP_ENVIRONMENT`, réponse validée par le schéma Zod ;
+- `invoices-query.service.ts` : lecture exposée par `resource()`, commandes dans un service séparé ;
+- `invoices.presenter.ts` : retirer `providedIn: 'root'`, exposer l'état avec `signal` et `computed`,
+  et le fournir dans `providers` de la page ;
+- `invoices.page.ts` : injecter le presenter et connecter le flux SSE partagé :
 
 ```ts
 private readonly environment = inject(APP_ENVIRONMENT);
@@ -313,7 +344,7 @@ export const routes: Routes = [
 ];
 ```
 
-#### 4. Brancher le workspace et le shell
+#### 5. Brancher le workspace et le shell
 
 - `package.json` : `"serve:invoices": "ng serve mfe-invoices --port 4204"` ;
 - `server/db.json` : collection `"invoices": [...]` pour json-server ;
