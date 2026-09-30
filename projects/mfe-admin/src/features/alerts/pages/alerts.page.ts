@@ -37,7 +37,7 @@ import { AlertCardComponent } from '@admin/features/alerts/components';
           <span>À surveiller</span><strong>{{ presenter.warningCount() }}</strong>
         </article>
         <article>
-          <span>Total</span><strong>{{ (presenter.alerts.value() ?? []).length }}</strong>
+          <span>Total</span><strong>{{ presenter.totalCount() }}</strong>
         </article>
       </section>
 

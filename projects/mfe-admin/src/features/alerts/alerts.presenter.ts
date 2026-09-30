@@ -26,13 +26,15 @@ export class AlertsPresenter {
   readonly severities = ['all', 'critical', 'warning', 'info'] as const;
   readonly visibleAlerts = computed(() => {
     const severity = this.selectedSeverity();
-    const alerts = this.alerts.value() ?? [];
+    const alerts = this.alerts.hasValue() ? this.alerts.value() : [];
     return severity === 'all' ? alerts : alerts.filter((alert) => alert.severity === severity);
   });
+  readonly allAlerts = computed(() => (this.alerts.hasValue() ? this.alerts.value() : []));
   readonly criticalCount = computed(
-    () => (this.alerts.value() ?? []).filter((alert) => alert.severity === 'critical').length,
+    () => this.allAlerts().filter((alert) => alert.severity === 'critical').length,
   );
   readonly warningCount = computed(
-    () => (this.alerts.value() ?? []).filter((alert) => alert.severity === 'warning').length,
+    () => this.allAlerts().filter((alert) => alert.severity === 'warning').length,
   );
+  readonly totalCount = computed(() => this.allAlerts().length);
 }

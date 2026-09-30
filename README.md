@@ -78,6 +78,11 @@ npx ng test lib-http-client --watch=false
 npx ng test lib-mfe-sse --watch=false
 ```
 
+Le shell utilise les URL déclarées dans `src/environments.ts` pour ouvrir les MFE :
+
+- Produits : `http://localhost:4201`
+- Administration : `http://localhost:4202`
+
 Les Signal Forms du formulaire produit sont expérimentales dans Angular 21. Elles illustrent le modèle signal demandé, mais leur stabilité doit être réévaluée avant une mise en production.
 
 ## Prompts utiles pour le développement

@@ -3,11 +3,10 @@
     <div class="brand">{{ title() }}</div>
     <nav class="nav-list" aria-label="Menu principal">
       <a routerLink="/">Accueil</a>
-      <a routerLink="/">Produits</a>
-      <a routerLink="/">Administration</a>
+      <a [href]="productsMfeUrl">Produits</a>
+      <a [href]="adminMfeUrl">Administration</a>
     </nav>
   </header>
 
   <router-outlet />
 </main>
-

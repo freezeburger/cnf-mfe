@@ -53,8 +53,9 @@ export class ProductsPresenter {
   readonly filteredProducts = computed(() => {
     const search = this.searchTerm().trim().toLocaleLowerCase();
     const category = this.category();
+    const products = this.products.hasValue() ? this.products.value() : [];
 
-    return (this.products.value() ?? []).filter((product) => {
+    return products.filter((product) => {
       const matchesCategory = category === 'all' || product.category === category;
       const matchesSearch =
         !search || `${product.name} ${product.description}`.toLocaleLowerCase().includes(search);
