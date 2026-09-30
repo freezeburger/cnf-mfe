@@ -64,11 +64,12 @@ npx ng build lib-design-system
 npx ng build lib-http-client
 npx ng build lib-mfe-sse
 
-# Lancer le shell
-npx ng serve mfe-shell
+# Servir chaque application dans un terminal dédié
+npm run serve:shell
+npm run serve:products
+npm run serve:admin
 
-# Lancer un MFE et l'API json-server (deux terminaux)
-npx ng serve mfe-products
+# Démarrer l'API json-server dans un autre terminal pour les MFE
 npm run api
 
 # Exécuter les tests des bibliothèques partagées
