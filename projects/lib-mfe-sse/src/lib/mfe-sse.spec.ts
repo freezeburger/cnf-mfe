@@ -1,22 +1,16 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MfeSseBridge, type MfeEvent } from './mfe-sse';
 
-import { MfeSse } from './mfe-sse';
+describe('MfeSseBridge', () => {
+  it('parses and forwards messages from an event source', () => {
+    const bridge = new MfeSseBridge();
+    const source = { onmessage: null } as EventSource;
+    let received: MfeEvent | undefined;
 
-describe('MfeSse', () => {
-  let component: MfeSse;
-  let fixture: ComponentFixture<MfeSse>;
+    bridge.subscribe(source, (event) => (received = event));
+    source.onmessage?.({
+      data: JSON.stringify({ type: 'product.updated', payload: { id: 'p-1' } }),
+    } as MessageEvent);
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [MfeSse],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(MfeSse);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(received).toEqual({ type: 'product.updated', payload: { id: 'p-1' } });
   });
 });

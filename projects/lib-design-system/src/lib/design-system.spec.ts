@@ -1,22 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DesignSystem } from './design-system';
+import { DesignSystemCard } from './design-system';
 
-describe('DesignSystem', () => {
-  let component: DesignSystem;
-  let fixture: ComponentFixture<DesignSystem>;
+describe('DesignSystemCard', () => {
+  let fixture: ComponentFixture<DesignSystemCard>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DesignSystem],
+      imports: [DesignSystemCard],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DesignSystem);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture = TestBed.createComponent(DesignSystemCard);
+    fixture.componentRef.setInput('title', 'Catalogue');
+    fixture.componentRef.setInput('description', 'Vue des produits disponibles');
+    fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('renders its title and description inputs', () => {
+    expect(fixture.nativeElement.querySelector('h3').textContent).toContain('Catalogue');
+    expect(fixture.nativeElement.textContent).toContain('Vue des produits disponibles');
   });
 });
