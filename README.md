@@ -88,6 +88,9 @@ npx ng build lib-http-client
 npx ng build lib-mfe-sse
 npx ng build lib-config
 
+# Générer un nouveau MFE standardisé (voir « Ajouter un nouveau MFE »)
+npm run generate:mfe -- orders
+
 # Servir chaque application dans un terminal dédié
 npm run serve:shell
 npm run serve:products
@@ -112,6 +115,116 @@ Le shell reste l'unique URL de navigation. Son routeur charge les routes exposé
 - `/admin` charge `mfe-admin/Routes` depuis `http://localhost:4202/remoteEntry.json`
 
 Les URL de remotes sont déclarées dans `projects/mfe-shell/public/federation.manifest.json` et peuvent être remplacées au déploiement sans reconstruire le shell.
+
+## Ajouter un nouveau MFE
+
+Un MFE est une application Angular indépendante chargée par `mfe-shell` avec Native
+Federation. Pour ajouter un domaine `orders` (à remplacer par le nom réel du domaine), suivre
+les étapes suivantes.
+
+### 1. Générer le MFE
+
+Depuis la racine du workspace, lancer le générateur avec le nom du domaine en kebab-case (sans
+le préfixe `mfe-`) :
+
+```bash
+npm run generate:mfe -- orders
+```
+
+Options disponibles :
+
+| Option            | Rôle                                            | Défaut                         |
+| ----------------- | ----------------------------------------------- | ------------------------------ |
+| `--entity <nom>`  | nom de l'entité du modèle (kebab-case)          | domaine au singulier (`order`) |
+| `--label <texte>` | libellé affiché dans le shell et les pages      | domaine en titre (`Orders`)    |
+| `--port <numéro>` | port local du remote                            | plus grand port utilisé + 1    |
+| `--dry-run`       | affiche les fichiers créés/modifiés sans écrire | —                              |
+
+```bash
+npm run generate:mfe -- customer-orders --entity order --label "Commandes" --port 4210
+```
+
+Le script refuse un domaine réservé, un dossier, un alias ou un port déjà existant.
+
+### 2. Arborescence générée
+
+Le générateur pose la structure standard d'un MFE, sur le modèle de `mfe-admin` :
+
+```text
+projects/mfe-orders/
+  federation.config.mjs          # remote Native Federation v4, expose ./Routes
+  README.md
+  tsconfig.app.json / tsconfig.spec.json
+  public/favicon.ico
+  src/
+    index.html, main.ts, bootstrap.ts, styles.css
+    environments.ts              # apiBaseUrl, sseUrl (contrat lib-config)
+    app/
+      app.ts, app.config.ts
+      app.routes.ts              # routes lazy exposées au shell
+    core/config/environment.ts   # provideEnvironment() + APP_ENVIRONMENT
+    core/services/index.ts       # services applicatifs du remote
+    share/components/index.ts    # barrel (DesignSystemCard)
+    layout/app-layout.component.ts
+    infra/http/orders-http.service.ts        # HttpClientService + validation Zod
+    features/orders/
+      models/order.model.ts                  # schéma Zod + type inféré
+      services/orders-query.service.ts       # query CQS via resource()
+      components/order-card.component.ts     # présentation (+ barrel index.ts)
+      pages/orders.page.ts                   # page lazy, recherche, message SSE
+      orders.presenter.ts                    # état signal et dérivés computed
+      index.ts
+```
+
+La page se connecte au flux partagé avec `MfeSseBridge` (`lib-mfe-sse`) et affiche le dernier
+message SSE, comme Products et Admin. Tous les composants sont standalone et `OnPush`.
+
+### 3. Enregistrements automatiques
+
+Le script met également à jour, en conservant leur mise en forme :
+
+| Fichier                                              | Modification                               |
+| ---------------------------------------------------- | ------------------------------------------ |
+| `angular.json`                                       | projet `mfe-orders` (builders federation)  |
+| `tsconfig.json`                                      | alias `@orders/*` et référence du projet   |
+| `package.json`                                       | script `serve:orders` sur le port attribué |
+| `server/db.json`                                     | collection `orders` avec un exemple        |
+| `projects/mfe-shell/public/federation.manifest.json` | URL du `remoteEntry.json`                  |
+| `projects/mfe-shell/src/app/app.routes.ts`           | route `/orders` via `loadRemoteModule`     |
+| `projects/mfe-shell/src/app/app.html`                | lien de navigation                         |
+
+Le nom passé à `loadRemoteModule` est identique au `name` de `federation.config.mjs` et à la
+clé du manifest : ces trois valeurs doivent rester synchronisées si elles sont modifiées.
+
+### 4. Adapter le domaine
+
+Le code généré est un point de départ fonctionnel. Adapter ensuite :
+
+- le schéma Zod `models/order.model.ts` et les données de `server/db.json` ;
+- l'adaptateur `infra/http/orders-http.service.ts` si l'API diffère ;
+- les commandes métier (écriture) dans `services/`, séparées des queries ;
+- les composants de présentation et la page ;
+- le `README.md` du MFE.
+
+### 5. Vérifier l'intégration
+
+Construire puis démarrer l'API, le SSE, le nouveau remote et le shell dans des terminaux séparés :
+
+```bash
+npx ng build mfe-orders
+npm run api
+npm run sse
+npm run serve:orders
+npm run serve:shell
+```
+
+Vérifier les points suivants :
+
+1. `http://localhost:4203/remoteEntry.json` est accessible ;
+2. `http://localhost:4200/orders` affiche le MFE sans erreur de chargement fédéré ;
+3. la navigation directe et le rechargement de `/orders` fonctionnent ;
+4. les appels HTTP, les erreurs et les événements SSE utilisent les bibliothèques partagées ;
+5. `npx ng build mfe-shell` et `npx ng build mfe-orders` réussissent.
 
 ## Communication SSE
 
