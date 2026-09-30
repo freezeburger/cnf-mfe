@@ -125,7 +125,7 @@ Les URL de remotes sont déclarées dans `projects/mfe-shell/public/federation.m
 
 Un MFE est une application Angular indépendante chargée par `mfe-shell` avec Native
 Federation. Pour ajouter un domaine `invoices` (à remplacer par le nom réel du domaine), suivre
-les étapes suivantes.
+les étapes suivantes. Pour créer le MFE sans le générateur, voir [Ajout manuel](#ajout-manuel).
 
 ### 1. Générer le MFE
 
@@ -230,6 +230,111 @@ Vérifier les points suivants :
 3. la navigation directe et le rechargement de `/invoices` fonctionnent ;
 4. les appels HTTP, les erreurs et les événements SSE utilisent les bibliothèques partagées ;
 5. `npx ng build mfe-shell` et `npx ng build mfe-invoices` réussissent.
+
+### Ajout manuel
+
+Sans le générateur, reproduire les mêmes étapes à la main en partant de `mfe-admin`. Éviter
+`ng generate application` : il crée des builders `@angular/build` standard qu'il faudrait
+ensuite remplacer par ceux de Native Federation v4.
+
+#### 1. Déclarer le projet dans `angular.json`
+
+Dupliquer le bloc `"mfe-admin": { ... }`, le renommer `"mfe-invoices"`, remplacer toutes les
+occurrences de `mfe-admin` par `mfe-invoices`, puis choisir un port libre dans
+`serve-original.options.port` (ex. `4204`).
+
+#### 2. Créer les fichiers techniques
+
+Copier depuis `projects/mfe-admin/` puis remplacer `mfe-admin` par `mfe-invoices` :
+
+| Fichier                                   | Adaptation                                                     |
+| ----------------------------------------- | -------------------------------------------------------------- |
+| `federation.config.mjs`                   | `name` et chemin de `./Routes`                                 |
+| `tsconfig.app.json`, `tsconfig.spec.json` | retirer les chemins propres à `alerts` dans `include`          |
+| `public/favicon.ico`                      | aucune                                                         |
+| `src/index.html`                          | titre de la page                                               |
+| `src/styles.css`, `src/bootstrap.ts`      | aucune                                                         |
+| `src/main.ts`                             | clé `initFederation({ 'mfe-invoices': './remoteEntry.json' })` |
+| `src/environments.ts`                     | `appName`                                                      |
+| `src/app/app.ts`, `src/app/app.config.ts` | alias `@invoices/...`                                          |
+| `src/core/config/environment.ts`          | aucune                                                         |
+| `src/share/components/index.ts`           | composants partagés exposés                                    |
+| `src/layout/app-layout.component.ts`      | libellés                                                       |
+
+Ajouter l'alias et la référence du projet dans `tsconfig.json` :
+
+```jsonc
+"paths": {
+  "@invoices/*": ["projects/mfe-invoices/src/*"],
+  // ...
+},
+"references": [
+  // ...
+  { "path": "./projects/mfe-invoices/tsconfig.app.json" }
+]
+```
+
+#### 3. Écrire le domaine
+
+Créer `src/features/invoices/` et `src/infra/http/` en respectant l'ordre des dépendances :
+
+1. `models/invoice.model.ts` : schéma Zod et type `z.infer` ;
+2. `infra/http/invoices-http.service.ts` : `HttpClientService` de `http-client`, URL issue de
+   `APP_ENVIRONMENT`, réponse validée par le schéma ;
+3. `services/invoices-query.service.ts` : lecture exposée par `resource()`, commandes séparées ;
+4. `invoices.presenter.ts` : état `signal` et dérivés `computed`, fourni par la page ;
+5. `components/` : composants `OnPush` de présentation, exposés par `index.ts` ;
+6. `pages/invoices.page.ts` : page lazy qui connecte le flux SSE partagé :
+
+```ts
+private readonly environment = inject(APP_ENVIRONMENT);
+readonly sse = inject(MfeSseBridge);
+
+constructor() {
+  this.sse.connect(this.environment.sseUrl);
+}
+
+protected eventMessage(): string {
+  return getMfeEventMessage(this.sse.latestEvent());
+}
+```
+
+Déclarer enfin les routes exposées dans `src/app/app.routes.ts` :
+
+```ts
+export const routes: Routes = [
+  {
+    path: '',
+    providers: [...provideEnvironment(), InvoicesHttpService, InvoicesQueryService],
+    loadComponent: () =>
+      import('../features/invoices/pages/invoices.page').then((module) => module.InvoicesPage),
+  },
+  { path: '**', redirectTo: '' },
+];
+```
+
+#### 4. Brancher le workspace et le shell
+
+- `package.json` : `"serve:invoices": "ng serve mfe-invoices --port 4204"` ;
+- `server/db.json` : collection `"invoices": [...]` pour json-server ;
+- `projects/mfe-shell/public/federation.manifest.json` :
+  `"mfe-invoices": "http://localhost:4204/remoteEntry.json"` ;
+- `projects/mfe-shell/src/app/app.routes.ts` : route avant le wildcard `**` ;
+
+```ts
+{
+  path: 'invoices',
+  loadChildren: () =>
+    federation
+      .as<RemoteRoutes>()
+      .loadRemoteModule('mfe-invoices', './Routes')
+      .then((module) => module.routes),
+},
+```
+
+- `projects/mfe-shell/src/app/app.html` : `<a routerLink="/invoices">Factures</a>` dans la `nav`.
+
+Terminer par les vérifications de l'[étape 5](#5-vérifier-lintégration).
 
 ## Communication SSE
 
