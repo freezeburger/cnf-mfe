@@ -5,6 +5,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@orders/*": ["projects/mfe-orders/src/*"],
       "@products/*": ["projects/mfe-products/src/*"],
       "@admin/*": ["projects/mfe-admin/src/*"],
       "design-system": ["./dist/design-system"],
@@ -40,6 +41,9 @@
     },
     {
       "path": "./projects/mfe-admin/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/mfe-orders/tsconfig.app.json"
     },
     {
       "path": "./projects/lib-design-system/tsconfig.lib.json"

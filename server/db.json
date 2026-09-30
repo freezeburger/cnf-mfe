@@ -50,5 +50,13 @@
       "source": "Collecteur de journaux",
       "createdAt": "2026-09-30T07:00:00.000Z"
     }
+  ],
+  "orders": [
+    {
+      "id": "order-1",
+      "title": "Premier élément Orders",
+      "description": "Donnée d'exemple générée pour mfe-orders.",
+      "createdAt": "2026-09-30T10:30:34.678Z"
+    }
   ]
 }

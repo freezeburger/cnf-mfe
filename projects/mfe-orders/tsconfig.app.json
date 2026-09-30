@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/app",
+    "types": []
+  },
+  "include": [
+    "src/**/*.ts",
+    "../../dist/design-system",
+    "../../dist/http-client",
+    "../../dist/lib-config",
+    "../../dist/mfe-sse"
+  ],
+  "exclude": ["src/**/*.spec.ts"]
+}

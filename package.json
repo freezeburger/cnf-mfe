@@ -8,6 +8,7 @@
     "serve:shell": "ng serve mfe-shell --port 4200",
     "serve:products": "ng serve mfe-products --port 4201",
     "serve:admin": "ng serve mfe-admin --port 4202",
+    "serve:orders": "ng serve mfe-orders --port 4203",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

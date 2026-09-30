@@ -29,6 +29,14 @@ export function routes(federation: NativeFederationResult): Routes {
           .then((module) => module.routes),
     },
     {
+      path: 'orders',
+      loadChildren: () =>
+        federation
+          .as<RemoteRoutes>()
+          .loadRemoteModule('mfe-orders', './Routes')
+          .then((module) => module.routes),
+    },
+    {
       path: '**',
       redirectTo: '',
     },
