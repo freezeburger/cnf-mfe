@@ -1,5 +1,10 @@
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { App } from './app/app';
+import {
+  initFederation,
+  type NativeFederationResult,
+} from '@angular-architects/native-federation-v4';
 
-bootstrapApplication(App, appConfig).catch((err) => console.error(err));
+initFederation('federation.manifest.json')
+  .then((federation: NativeFederationResult) =>
+    import('./bootstrap').then(({ bootstrap }) => bootstrap(federation)),
+  )
+  .catch((error: unknown) => console.error('Native Federation initialization failed.', error));

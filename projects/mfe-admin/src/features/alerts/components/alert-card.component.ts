@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { DesignSystemCard } from 'design-system';
 
-import { DesignSystemCard } from '@admin/share/components';
 import type { Alert } from '@admin/features/alerts/models/alert.model';
 
 /**

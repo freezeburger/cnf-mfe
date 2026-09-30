@@ -1,7 +1,7 @@
 import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { DesignSystemCard } from 'design-system';
 
-import { DesignSystemCard } from '@products/share/components';
 import type { Product } from '@products/features/products/models/product.model';
 
 /**

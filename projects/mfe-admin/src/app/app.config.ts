@@ -7,5 +7,10 @@ import { provideEnvironment } from '@core/config/environment';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideBrowserGlobalErrorListeners(), provideHttpClient(), provideRouter(routes), ...provideEnvironment()],
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideHttpClient(),
+    provideRouter(routes),
+    ...provideEnvironment(),
+  ],
 };

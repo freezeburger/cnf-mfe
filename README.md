@@ -43,6 +43,7 @@ Les frontières de domaine et le choix CQS/`resource` sont détaillés dans [ADR
 
 - `mfe-*` pour les applications front-end isolées
 - `lib-*` pour les bibliothèques réutilisables
+- Native Federation v4 pour charger les routes distantes dans le routeur du shell
 - `OnPush` et signals dans les composants Angular 21
 - routes lazy-loadées dans chaque application
 - injection token pour la configuration d’environnement
@@ -78,10 +79,12 @@ npx ng test lib-http-client --watch=false
 npx ng test lib-mfe-sse --watch=false
 ```
 
-Le shell utilise les URL déclarées dans `src/environments.ts` pour ouvrir les MFE :
+Le shell reste l'unique URL de navigation. Son routeur charge les routes exposées par Native Federation :
 
-- Produits : `http://localhost:4201`
-- Administration : `http://localhost:4202`
+- `/products` charge `mfe-products/Routes` depuis `http://localhost:4201/remoteEntry.json`
+- `/admin` charge `mfe-admin/Routes` depuis `http://localhost:4202/remoteEntry.json`
+
+Les URL de remotes sont déclarées dans `projects/mfe-shell/public/federation.manifest.json` et peuvent être remplacées au déploiement sans reconstruire le shell.
 
 Les Signal Forms du formulaire produit sont expérimentales dans Angular 21. Elles illustrent le modèle signal demandé, mais leur stabilité doit être réévaluée avant une mise en production.
 

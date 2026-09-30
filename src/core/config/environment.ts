@@ -6,8 +6,6 @@ export interface AppEnvironment {
   appName: string;
   apiBaseUrl: string;
   sseUrl: string;
-  productsMfeUrl: string;
-  adminMfeUrl: string;
 }
 
 export const APP_ENVIRONMENT = new InjectionToken<AppEnvironment>('APP_ENVIRONMENT');

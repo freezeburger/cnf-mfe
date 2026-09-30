@@ -54,8 +54,9 @@ server/
 
 ### 4. MFE et shell
 
-- Définir le shell comme point d'entrée unique et dyssocier les microfrontends via routes lazy-loaded.
-- Prévoir des intégrations `native-federation` et un contrat d'API stable entre shell et MFE.
+- Définir le shell comme point d'entrée unique et découpler les microfrontends via des routes lazy-loaded.
+- Exposer `./Routes` depuis chaque MFE avec Native Federation v4.
+- Charger les routes distantes depuis le manifeste dynamique du shell avec le résultat de `initFederation` injecté au bootstrap.
 
 ## Critères de validation
 
@@ -63,6 +64,7 @@ server/
 - Les lectures asynchrones utilisent `resource`, les valeurs dérivées `computed`, et le formulaire produit Signal Forms (expérimentales sous Angular 21).
 - La couche HTTP normalize les erreurs HTTP.
 - Les routes sont lazy-loaded.
+- La navigation reste sur le domaine du shell pendant le chargement des routes fédérées.
 - Les types models sont inférés à partir de schémas Zod.
 - Les commands d'écriture sont séparées des queries de lecture (CQS).
 

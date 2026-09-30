@@ -17,16 +17,31 @@ import { SectionCard } from '@share/components';
     <section class="home-shell">
       <p class="eyebrow">{{ appName() }}</p>
       <h2>{{ title() }}</h2>
-      <p class="lead">Shell Angular orienté micro frontends avec design system partagé et services d'infrastructure.</p>
+      <p class="lead">
+        Shell Angular orienté micro frontends avec design system partagé et services
+        d'infrastructure.
+      </p>
 
       <div class="card-grid">
-        <app-section-card title="Shell" description="Le shell centralise la navigation et l'orchestration des MFE." eyebrow="Architecture">
+        <app-section-card
+          title="Shell"
+          description="Le shell centralise la navigation et l'orchestration des MFE."
+          eyebrow="Architecture"
+        >
           <strong>Routage lazy-loaded</strong>
         </app-section-card>
-        <app-section-card title="Design System" description="Les composants partagés garantissent un langage visuel cohérent." eyebrow="UI kit">
+        <app-section-card
+          title="Design System"
+          description="Les composants partagés garantissent un langage visuel cohérent."
+          eyebrow="UI kit"
+        >
           <strong>Composants réutilisables</strong>
         </app-section-card>
-        <app-section-card title="Observabilité" description="Le flux SSE et le bus d'événements assurent la propagation des notifications." eyebrow="Infra">
+        <app-section-card
+          title="Observabilité"
+          description="Le flux SSE et le bus d'événements assurent la propagation des notifications."
+          eyebrow="Infra"
+        >
           <strong>{{ status() }}</strong>
         </app-section-card>
       </div>
@@ -37,10 +52,10 @@ import { SectionCard } from '@share/components';
       margin: 2rem auto;
       max-width: 1100px;
       padding: 2rem;
-      background: rgba(255,255,255,0.72);
-      border: 1px solid rgba(148,163,184,0.28);
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.28);
       border-radius: 1rem;
-      box-shadow: 0 18px 45px rgba(15,23,42,0.06);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
     }
 
     .eyebrow {
