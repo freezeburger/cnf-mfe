@@ -1,64 +1,65 @@
-# MfeSse
+# `mfe-sse`
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.0.
+Bibliothèque Angular partagée qui porte le contrat et l'état de la communication
+Server-Sent Events (SSE) de la plateforme.
 
-## Code scaffolding
+## Responsabilité
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+`mfe-sse` est la source de vérité pour :
 
-```bash
-ng generate component component-name
+- le contrat `MfeEvent` ;
+- l'ouverture d'une connexion `EventSource` unique ;
+- l'état `connected`, les erreurs et les cinq derniers événements sous forme de signals ;
+- la validation minimale des messages reçus ;
+- l'extraction d'un message présentable avec `getMfeEventMessage`.
+
+La bibliothèque ne connaît ni les URLs d'environnement ni la mise en page des applications.
+Chaque application appelle `connect(environment.sseUrl)` et choisit comment présenter le flux.
+
+## Utilisation
+
+```ts
+import { Component, inject } from '@angular/core';
+import { getMfeEventMessage, MfeSseBridge } from 'mfe-sse';
+
+@Component({
+  selector: 'app-live-status',
+  template: `<p>{{ message() }}</p>`,
+})
+export class LiveStatus {
+  private readonly sse = inject(MfeSseBridge);
+
+  constructor() {
+    this.sse.connect('http://localhost:3001/events');
+  }
+
+  message(): string {
+    return getMfeEventMessage(this.sse.latestEvent());
+  }
+}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Avec Native Federation, le mapping `mfe-sse` doit rester `singleton` dans le shell et
+les remotes. Les composants fédérés observent alors la même connexion et le même signal.
 
-```bash
-ng generate --help
+## Contrat d'événement
+
+```ts
+interface MfeEvent {
+  id: string;
+  type: string;
+  source: string;
+  timestamp: string;
+  payload: unknown;
+}
 ```
 
-## Building
-
-To build the library, run:
+## Commandes
 
 ```bash
-ng build mfe-sse
+npx ng build lib-mfe-sse
+npx ng test lib-mfe-sse --watch=false
+npm run sse
 ```
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
-
-### Publishing the Library
-
-Once the project is built, you can publish your library by following these steps:
-
-1. Navigate to the `dist` directory:
-
-   ```bash
-   cd dist/mfe-sse
-   ```
-
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Le serveur local est documenté dans le [README du workspace](../../README.md).

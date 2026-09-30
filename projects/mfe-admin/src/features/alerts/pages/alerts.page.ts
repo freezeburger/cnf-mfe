@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { getMfeEventMessage, MfeSseBridge } from 'mfe-sse';
 
+import { APP_ENVIRONMENT } from '@admin/core/config/environment';
 import { AlertsPresenter } from '@admin/features/alerts/alerts.presenter';
 import type { AlertSeverity } from '@admin/features/alerts/models/alert.model';
 import { AlertCardComponent } from '@admin/features/alerts/components';
@@ -28,6 +30,14 @@ import { AlertCardComponent } from '@admin/features/alerts/components';
           Actualiser
         </button>
       </header>
+
+      <section class="live-message" aria-labelledby="admin-live-title" aria-live="polite">
+        <div>
+          <p class="eyebrow">SSE partagé</p>
+          <h2 id="admin-live-title">Message temps réel</h2>
+        </div>
+        <p>{{ eventMessage() }}</p>
+      </section>
 
       <section class="summary" aria-label="Synthèse des alertes">
         <article>
@@ -122,6 +132,21 @@ import { AlertCardComponent } from '@admin/features/alerts/components';
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 0.85rem;
     }
+    .live-message {
+      display: grid;
+      grid-template-columns: minmax(11rem, auto) 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      border: 1px solid #fcd34d;
+      border-radius: 0.8rem;
+      background: #fffbeb;
+    }
+    .live-message p {
+      margin: 0;
+      color: #92400e;
+      font-weight: 650;
+    }
     .summary article {
       display: grid;
       gap: 0.45rem;
@@ -211,7 +236,17 @@ import { AlertCardComponent } from '@admin/features/alerts/components';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlertsPage {
+  private readonly environment = inject(APP_ENVIRONMENT);
+  readonly sse = inject(MfeSseBridge);
   readonly presenter = inject(AlertsPresenter);
+
+  constructor() {
+    this.sse.connect(this.environment.sseUrl);
+  }
+
+  protected eventMessage(): string {
+    return getMfeEventMessage(this.sse.latestEvent());
+  }
 
   protected readSeverity(event: Event): AlertSeverity | 'all' {
     const value = event.target instanceof HTMLSelectElement ? event.target.value : 'all';

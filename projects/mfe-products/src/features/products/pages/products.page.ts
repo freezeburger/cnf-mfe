@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { form, FormField, min, minLength, required } from '@angular/forms/signals';
+import { getMfeEventMessage, MfeSseBridge } from 'mfe-sse';
 
+import { APP_ENVIRONMENT } from '@products/core/config/environment';
 import { ProductsPresenter } from '@products/features/products/products.presenter';
 import { ProductCardComponent } from '@products/features/products/components';
 
@@ -26,6 +28,14 @@ import { ProductCardComponent } from '@products/features/products/components';
           >{{ presenter.filteredProducts().length }} résultat(s)</span
         >
       </header>
+
+      <section class="live-message" aria-labelledby="products-live-title" aria-live="polite">
+        <div>
+          <p class="eyebrow">SSE partagé</p>
+          <h2 id="products-live-title">Message temps réel</h2>
+        </div>
+        <p>{{ eventMessage() }}</p>
+      </section>
 
       <section class="catalog" aria-labelledby="catalog-title">
         <h2 id="catalog-title">Références disponibles</h2>
@@ -178,13 +188,25 @@ import { ProductCardComponent } from '@products/features/products/components';
       font-weight: 700;
     }
     .catalog,
-    .create-panel {
+    .create-panel,
+    .live-message {
       display: grid;
       gap: 1rem;
       padding: clamp(1rem, 3vw, 1.5rem);
       border: 1px solid #dbe4ee;
       border-radius: 1rem;
       background: #fff;
+    }
+    .live-message {
+      grid-template-columns: minmax(11rem, auto) 1fr;
+      align-items: center;
+      border-color: #99f6e4;
+      background: #f0fdfa;
+    }
+    .live-message p {
+      margin: 0;
+      color: #115e59;
+      font-weight: 650;
     }
     .filters,
     .form-grid {
@@ -292,6 +314,8 @@ import { ProductCardComponent } from '@products/features/products/components';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsPage {
+  private readonly environment = inject(APP_ENVIRONMENT);
+  readonly sse = inject(MfeSseBridge);
   readonly presenter = inject(ProductsPresenter);
   readonly productForm = form(this.presenter.draft, (path) => {
     required(path.name);
@@ -300,6 +324,14 @@ export class ProductsPage {
     min(path.stock, 0);
     minLength(path.description, 5);
   });
+
+  constructor() {
+    this.sse.connect(this.environment.sseUrl);
+  }
+
+  protected eventMessage(): string {
+    return getMfeEventMessage(this.sse.latestEvent());
+  }
 
   protected readText(event: Event): string {
     return event.target instanceof HTMLInputElement ? event.target.value : '';

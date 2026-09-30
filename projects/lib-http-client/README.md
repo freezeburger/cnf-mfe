@@ -1,64 +1,40 @@
-# HttpClient
+# `http-client`
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.0.
+Abstraction HTTP technique commune aux domaines des microfrontends.
 
-## Code scaffolding
+## Responsabilité
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+`HttpClientService` encapsule `HttpClient` et normalise les erreurs réseau en
+`HttpClientError`. Il ne contient aucune URL, aucun DTO métier et aucune règle de domaine.
 
-```bash
-ng generate component component-name
+Les adaptateurs applicatifs restent dans chaque MFE :
+
+- `mfe-products/src/infra/http/products-http.service.ts` valide les produits avec Zod ;
+- `mfe-admin/src/infra/http/alerts-http.service.ts` valide les alertes avec Zod.
+
+Cette séparation évite qu'une bibliothèque technique dépende d'un domaine fonctionnel.
+
+## Utilisation
+
+```ts
+import { inject, Injectable } from '@angular/core';
+import { HttpClientService } from 'http-client';
+
+@Injectable({ providedIn: 'root' })
+export class CatalogGateway {
+  private readonly http = inject(HttpClientService);
+
+  list() {
+    return this.http.get<unknown>('/api/products');
+  }
+}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Le consommateur doit valider la réponse `unknown` avant de l'exposer au domaine.
+
+## Commandes
 
 ```bash
-ng generate --help
+npx ng build lib-http-client
+npx ng test lib-http-client --watch=false
 ```
-
-## Building
-
-To build the library, run:
-
-```bash
-ng build http-client
-```
-
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
-
-### Publishing the Library
-
-Once the project is built, you can publish your library by following these steps:
-
-1. Navigate to the `dist` directory:
-
-   ```bash
-   cd dist/http-client
-   ```
-
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

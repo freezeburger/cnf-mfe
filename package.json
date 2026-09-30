@@ -10,7 +10,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "api": "json-server server/db.json --port 3000"
+    "api": "json-server server/db.json --port 3000",
+    "sse": "node server/sse-server.mjs"
   },
   "private": true,
   "packageManager": "npm@11.19.0",

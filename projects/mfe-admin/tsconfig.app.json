@@ -8,10 +8,10 @@
     "src/**/*.ts",
     "src/features/alerts/components/index.ts",
     "src/core/config/environment.ts",
-    "../../src/core/config/environment.ts",
     "src/share/components/index.ts",
     "../../dist/design-system",
     "../../dist/http-client",
+    "../../dist/lib-config",
     "../../dist/mfe-sse"
   ],
   "exclude": ["src/**/*.spec.ts"]

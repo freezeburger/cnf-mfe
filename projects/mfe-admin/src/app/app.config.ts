@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
-import { provideEnvironment } from '@core/config/environment';
+import { provideEnvironment } from '@admin/core/config/environment';
 
 import { routes } from './app.routes';
 

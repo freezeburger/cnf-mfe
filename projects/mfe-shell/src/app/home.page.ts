@@ -5,14 +5,13 @@
  * <app-home-page />
  */
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { DesignSystemCard } from 'design-system';
 
-import { APP_ENVIRONMENT } from '@core/config/environment';
-import { SectionCard } from '@share/components';
+import { APP_ENVIRONMENT } from '../core/config/environment';
 
 @Component({
   selector: 'app-home-page',
-  standalone: true,
-  imports: [SectionCard],
+  imports: [DesignSystemCard],
   template: `
     <section class="home-shell">
       <p class="eyebrow">{{ appName() }}</p>
@@ -23,27 +22,27 @@ import { SectionCard } from '@share/components';
       </p>
 
       <div class="card-grid">
-        <app-section-card
+        <lib-design-system-card
           title="Shell"
           description="Le shell centralise la navigation et l'orchestration des MFE."
           eyebrow="Architecture"
         >
           <strong>Routage lazy-loaded</strong>
-        </app-section-card>
-        <app-section-card
+        </lib-design-system-card>
+        <lib-design-system-card
           title="Design System"
           description="Les composants partagés garantissent un langage visuel cohérent."
           eyebrow="UI kit"
         >
           <strong>Composants réutilisables</strong>
-        </app-section-card>
-        <app-section-card
+        </lib-design-system-card>
+        <lib-design-system-card
           title="Observabilité"
           description="Le flux SSE et le bus d'événements assurent la propagation des notifications."
           eyebrow="Infra"
         >
           <strong>{{ status() }}</strong>
-        </app-section-card>
+        </lib-design-system-card>
       </div>
     </section>
   `,
@@ -95,5 +94,5 @@ export class HomePage {
 
   readonly appName = signal(this.environment.appName);
   readonly title = signal('Shell Angular + microfrontends');
-  readonly status = signal('Bus SSE prêt');
+  readonly status = signal('Flux visible dans le shell');
 }

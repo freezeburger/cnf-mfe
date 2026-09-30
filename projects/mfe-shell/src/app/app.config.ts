@@ -7,7 +7,7 @@ import {
 import { provideRouter } from '@angular/router';
 import type { NativeFederationResult } from '@angular-architects/native-federation-v4';
 
-import { provideEnvironment } from '@core/config/environment';
+import { provideEnvironment } from '../core/config/environment';
 
 import { routes } from './app.routes';
 

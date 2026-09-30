@@ -5,16 +5,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@core/*": ["src/core/*"],
-      "@infra/*": ["src/infra/*"],
-      "@share/*": ["src/share/*"],
-      "@env": ["src/environments"],
-      "@products/core/config/environment": ["projects/mfe-products/src/core/config/environment.ts"],
       "@products/*": ["projects/mfe-products/src/*"],
-      "@admin/core/config/environment": ["projects/mfe-admin/src/core/config/environment.ts"],
       "@admin/*": ["projects/mfe-admin/src/*"],
       "design-system": ["./dist/design-system"],
       "http-client": ["./dist/http-client"],
+      "lib-config": ["./dist/lib-config"],
       "mfe-sse": ["./dist/mfe-sse"]
     },
     "strict": true,
@@ -63,6 +58,12 @@
     },
     {
       "path": "./projects/lib-mfe-sse/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/lib-config/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/lib-config/tsconfig.spec.json"
     }
   ]
 }

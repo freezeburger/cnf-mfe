@@ -6,7 +6,42 @@
       <a routerLink="/products">Produits</a>
       <a routerLink="/admin">Administration</a>
     </nav>
+    <span
+      class="connection"
+      [class.connection-online]="sse.connected()"
+      role="status"
+      aria-live="polite"
+    >
+      <span class="connection-dot" aria-hidden="true"></span>
+      SSE {{ sse.connected() ? 'connecté' : 'déconnecté' }}
+    </span>
   </header>
 
   <router-outlet />
+
+  <aside class="event-stream" aria-labelledby="event-stream-title">
+    <div class="event-stream-heading">
+      <div>
+        <p class="event-eyebrow">Communication inter-MFE</p>
+        <h2 id="event-stream-title">Événements SSE</h2>
+      </div>
+      <span>{{ sse.events().length }} reçu(s)</span>
+    </div>
+
+    @if (sse.error()) {
+      <p class="event-error" role="alert">{{ sse.error() }}</p>
+    } @else if (sse.events().length === 0) {
+      <p class="event-empty">En attente du premier événement du serveur…</p>
+    } @else {
+      <ol class="event-list" aria-live="polite">
+        @for (event of sse.events(); track event.id) {
+          <li>
+            <strong>{{ event.type }}</strong>
+            <span>{{ event.source }}</span>
+            <time [attr.datetime]="event.timestamp">{{ event.timestamp }}</time>
+          </li>
+        }
+      </ol>
+    }
+  </aside>
 </main>

@@ -24,6 +24,9 @@ La composition des applications utilise Native Federation v4 :
 - Le résultat de `initFederation` est transmis explicitement au bootstrap Angular puis aux routes.
 - `/products` et `/admin` utilisent `loadChildren` ; l'URL et le layout du shell sont conservés.
 
+Les détails opérationnels et les liens vers le code sont regroupés dans le
+[guide Native Federation](../NATIVE_FEDERATION.md).
+
 ## Conséquences
 
 ### Avantages

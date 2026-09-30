@@ -1,7 +1,5 @@
 import { InjectionToken, type Provider } from '@angular/core';
 
-import { environment } from '../../environments';
-
 export interface AppEnvironment {
   appName: string;
   apiBaseUrl: string;
@@ -10,6 +8,6 @@ export interface AppEnvironment {
 
 export const APP_ENVIRONMENT = new InjectionToken<AppEnvironment>('APP_ENVIRONMENT');
 
-export function provideEnvironment(): Provider[] {
+export function provideAppEnvironment(environment: AppEnvironment): Provider[] {
   return [{ provide: APP_ENVIRONMENT, useValue: environment }];
 }

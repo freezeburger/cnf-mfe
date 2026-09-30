@@ -24,7 +24,7 @@ export default withNativeFederation({
 
   sharedMappings: [
     [
-      ['@core/config/environment', 'design-system', 'http-client', 'mfe-sse'],
+      ['design-system', 'http-client', 'lib-config', 'mfe-sse'],
       { includeSecondaries: { keepAll: true } },
     ],
   ],

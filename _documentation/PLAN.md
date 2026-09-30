@@ -4,6 +4,9 @@
 
 Construire un workspace Angular 21 structuré en shell + microfrontends, avec une base commune de types, une couche d'accès HTTP centralisée, un design system réutilisable et des routes lazy-loadées.
 
+Guide d'implémentation :
+[Native Federation v4 — points clés et code associé](./NATIVE_FEDERATION.md).
+
 ## Arborescence cible
 
 ```text

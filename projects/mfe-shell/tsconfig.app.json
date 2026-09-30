@@ -6,10 +6,9 @@
   },
   "include": [
     "src/**/*.ts",
-    "../../src/core/config/environment.ts",
-    "../../src/share/components/index.ts",
     "../../dist/design-system",
     "../../dist/http-client",
+    "../../dist/lib-config",
     "../../dist/mfe-sse"
   ],
   "exclude": ["src/**/*.spec.ts"]
